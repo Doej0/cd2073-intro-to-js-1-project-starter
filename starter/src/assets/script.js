@@ -8,6 +8,31 @@
    - productId: unique id for the product (number)
    - image: picture of product (url string)
 */
+products = [
+  cherry = {
+    name: "cherry",
+    price: 1.00,
+    quantity: 0,
+    productId: 1,
+    image: "/images/cherry.jpg"
+  },
+
+  orange = {
+    name: "orange",
+    price: 2.00,
+    quantity: 0,
+    productId: 2,
+    image: "/images/orange.jpg"
+  },
+
+  strawberry = {
+    name: "strawberry",
+    price: 3.00,
+    quantity: 0,
+    productId: 3,
+    image: "/images/strawberry.jpg"
+  }
+];
 
 /* Images provided in /images folder. All images from Unsplash.com
    - cherry.jpg by Mae Mu
@@ -16,6 +41,7 @@
 */
 
 /* Declare an empty array named cart to hold the items in the cart */
+const cart = [];
 
 /* Create a function named addProductToCart that takes in the product productId as an argument
   - addProductToCart should get the correct product based on the productId
@@ -65,15 +91,15 @@
 */
 
 module.exports = {
-   products,
-   cart,
-   addProductToCart,
-   increaseQuantity,
-   decreaseQuantity,
-   removeProductFromCart,
-   cartTotal,
-   pay, 
-   emptyCart,
-   /* Uncomment the following line if completing the currency converter bonus */
-   // currency
+  products,
+  cart,
+  addProductToCart,
+  increaseQuantity,
+  decreaseQuantity,
+  removeProductFromCart,
+  cartTotal,
+  pay,
+  emptyCart,
+  /* Uncomment the following line if completing the currency converter bonus */
+  // currency
 }
