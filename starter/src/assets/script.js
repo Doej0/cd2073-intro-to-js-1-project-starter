@@ -1,3 +1,22 @@
+//helper functions
+
+//find the products using the array, productId and .find() 
+
+function findProductById(productId,array) {
+  return array.find(product => product.productId === productId);
+}
+
+//remove products using the array, splice and index
+
+function removeProductByIndex(index,array){
+  array.splice(index, 1);
+}
+
+//increase the quantity of the product
+function increaseProductQuantity(product) {
+  product.quantity++;
+}
+
 /* Create an array named products which you will use to add all of your product object literals that you create in the next step. */
 
 /* Create 3 or more product objects using object literal notation 
@@ -9,7 +28,7 @@
    - image: picture of product (url string)
 */
 const products = [
- {
+  {
     name: "cherry",
     price: 2,
     quantity: 0,
@@ -17,7 +36,7 @@ const products = [
     image: "../images/cherry.jpg"
   },
 
- {
+  {
     name: "orange",
     price: 2,
     quantity: 0,
@@ -25,7 +44,7 @@ const products = [
     image: "../images/orange.jpg"
   },
 
-   {
+  {
     name: "strawberry",
     price: 4,
     quantity: 0,
@@ -49,27 +68,19 @@ const cart = [];
   - if the product is not already in the cart, add it to the cart
 */
 function addProductToCart(productId) {
-  let productFound = false;
-  for (let i = 0; i < products.length; i++) {
-    if (products[i].productId === productId) {
-      productFound = true;
-      const product = products[i];
-      let cartItemFound = false;
-      for (let j = 0; j < cart.length; j++) {
-        if (cart[j].productId === productId) {
-          cartItemFound = true;
-          cart[j].quantity++;
-          break;
-        }
-      }
-      if (!cartItemFound) {
-        cart.push({ ...product, quantity: 1 });
-      }
-      break;
-    }
+  const product = findProductById(productId, products); //helper function :)
+  if (!product) {
+    console.error(`Sorry, a Product with productId ${productId} could not be found.`);
+    return;
   }
-  if (!productFound) {
-    console.error(`Sorry a Product with productId ${productId} could not be found.`);
+
+  let cartItem = findProductById(productId, cart);
+
+  if (cartItem) {
+    increaseProductQuantity(cartItem); //helper function increasing the quantity in the cart
+  } else {                      //pushes product to the cart
+    product.quantity = 1;
+    cart.push(product);
   }
 }
 /* Create a function named increaseQuantity that takes in the productId as an argument
@@ -77,17 +88,11 @@ function addProductToCart(productId) {
   - increaseQuantity should then increase the product's quantity
 */
 function increaseQuantity(productId) {
-  let productFound = false; // This tracks whether the product was found in the loop
-  
-  for (let i = 0; i < cart.length; i++) {
-    if (cart[i].productId === productId) {
-      productFound = true; // Product is found, set to true
-      cart[i].quantity++; // Increase the quantity
-      break; // Exit the loop once the product is found and updated
-    }
-  }
-  
-  if (!productFound) {
+  const cartItem = findProductById(productId, cart);
+
+  if (cartItem) {
+    increaseProductQuantity(cartItem);
+  } else {
     console.error(`Sorry, a Product with productId ${productId} could not be found.`);
   }
 }
@@ -97,22 +102,17 @@ function increaseQuantity(productId) {
   - if the function decreases the quantity to 0, the product is removed from the cart
 */
 function decreaseQuantity(productId) {
-  let productFound = false; //prior to finding product set statement to false
-  //find the product in the array
-  for (let i = 0; i < cart.length; i++) {
-    if (cart[i].productId === productId) {
-      productFound = true; //Product found
-      cart[i].quantity--;
-      if (cart[i].quantity === 0) {
-        cart.splice(i, 1);  // Remove the product from cart
-      }
-      break;
+  const cartItem = findProductById(productId, cart);
+
+  if (cartItem) {
+    cartItem.quantity--;
+    if (cartItem.quantity === 0) {
+      removeProductByIndex(cart.indexOf(cartItem), cart); //helper function + indexof removes product from cart if quantity = 0
     }
+  } else {
+    console.error(`Sorry, a Product with productId ${productId} could not be found.`);
   }
-  if (!productFound) {
-    console.error(`Sorry a Product with productId ${productId} could not be found.`);
-      }
-    }
+}
 
 
 /* Create a function named removeProductFromCart that takes in the productId as an argument
@@ -121,22 +121,14 @@ function decreaseQuantity(productId) {
   - removeProductFromCart should remove the product from the cart
 */
 function removeProductFromCart(productId) {
-  let productFound = false; //prior to finding product set statement to false
-  let productIndex = -1; // To store the index of the product if found
-  //find the product in the array
-  for (let i = 0; i < cart.length; i++) {
-    if (cart[i].productId === productId) {
-      productFound = true; //Product found
-      productIndex = i; // Store the index of the found product
-      break; // Exit the loop once found
-    }
- }
- if (productFound) {
-  cart.splice(productIndex,1); //remove the product from the cart
- } else {
-  //if not found
-  console.error(`Product with ID ${productId} not found in the cart.`);
- }
+  const cartItemIndex = cart.findIndex(item => item.productId === productId); //finds index of product
+
+  if (cartItemIndex > -1) { //checking for product in the cart
+    cart[cartItemIndex].quantity = 0; // Reset the quantity in the products array
+    removeProductByIndex(cartItemIndex, cart); //removes product from the cart
+  } else {
+    console.error(`Product with ID ${productId} not found in the cart.`);
+  }
 }
 
 /* Create a function named cartTotal that has no parameters
@@ -144,19 +136,19 @@ function removeProductFromCart(productId) {
   - cartTotal should return the total cost of the products in the cart
   Hint: price and quantity can be used to determine total cost
 */
-function cartTotal(){
+function cartTotal() {
   let totalCost = 0;
   // iterate through the cart
-for(let i = 0; i < cart.length; i++ ) {
-  // calculate the total of each item
-  totalCost += cart[i].price * cart[i].quantity;
-  
-}
-return totalCost;
+  for (let i = 0; i < cart.length; i++) {
+    // calculate the total of each item
+    totalCost += cart[i].price * cart[i].quantity;
+
+  }
+  return totalCost;
 }
 
 /* Create a function called emptyCart that empties the products from the cart */
- function emptyCart() {
+function emptyCart() {
   while (cart.length > 0) {
     cart.pop();
   }
@@ -168,10 +160,10 @@ return totalCost;
   Hint: cartTotal function gives us cost of all the products in the cart  
 */
 
-function pay(amount){
+function pay(amount) {
   const totalCost = cartTotal();
   const remaining = amount - totalCost;
-  
+
   return remaining;
 
 }
@@ -194,6 +186,6 @@ module.exports = {
   cartTotal,
   pay,
   emptyCart,
-// //   /* Uncomment the following line if completing the currency converter bonus */
-// //   // currency
+  // //   /* Uncomment the following line if completing the currency converter bonus */
+  // //   // currency
 }
