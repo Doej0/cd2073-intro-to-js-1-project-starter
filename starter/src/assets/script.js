@@ -2,8 +2,8 @@
 
 //find the products using the array, productId and .find() 
 
-function findProductById(productId,array) {
-  return array.find(product => product.productId === productId);
+function getProductByIdFromList(productId,productList) {
+  return productList.find((product) => product.productId === productId);
 }
 
 //remove products using the array, splice and index
@@ -68,13 +68,9 @@ const cart = [];
   - if the product is not already in the cart, add it to the cart
 */
 function addProductToCart(productId) {
-  const product = findProductById(productId, products); //helper function :)
-  if (!product) {
-    console.error(`Sorry, a Product with productId ${productId} could not be found.`);
-    return;
-  }
+  let product = getProductByIdFromList(productId,products) //helper function :)
 
-  let cartItem = findProductById(productId, cart);
+  let cartItem = getProductByIdFromList(productId, cart);
 
   if (cartItem) {
     increaseProductQuantity(cartItem); //helper function increasing the quantity in the cart
@@ -88,13 +84,13 @@ function addProductToCart(productId) {
   - increaseQuantity should then increase the product's quantity
 */
 function increaseQuantity(productId) {
-  const cartItem = findProductById(productId, cart);
+  //find product in cart by its productId
+  const cartItem = getProductByIdFromList(productId, cart);
 
+  //if product is in cart, increase its quantity by 1
   if (cartItem) {
     increaseProductQuantity(cartItem);
-  } else {
-    console.error(`Sorry, a Product with productId ${productId} could not be found.`);
-  }
+  } 
 }
 /* Create a function named decreaseQuantity that takes in the productId as an argument
   - decreaseQuantity should get the correct product based on the productId
@@ -102,16 +98,14 @@ function increaseQuantity(productId) {
   - if the function decreases the quantity to 0, the product is removed from the cart
 */
 function decreaseQuantity(productId) {
-  const cartItem = findProductById(productId, cart);
+  const cartItem = getProductByIdFromList(productId, cart);
 
   if (cartItem) {
     cartItem.quantity--;
     if (cartItem.quantity === 0) {
       removeProductByIndex(cart.indexOf(cartItem), cart); //helper function + indexof removes product from cart if quantity = 0
     }
-  } else {
-    console.error(`Sorry, a Product with productId ${productId} could not be found.`);
-  }
+  } 
 }
 
 
@@ -126,9 +120,7 @@ function removeProductFromCart(productId) {
   if (cartItemIndex > -1) { //checking for product in the cart
     cart[cartItemIndex].quantity = 0; // Reset the quantity in the products array
     removeProductByIndex(cartItemIndex, cart); //removes product from the cart
-  } else {
-    console.error(`Product with ID ${productId} not found in the cart.`);
-  }
+  } 
 }
 
 /* Create a function named cartTotal that has no parameters
@@ -159,11 +151,22 @@ function emptyCart() {
   - pay will return a positive number if money should be returned to customer
   Hint: cartTotal function gives us cost of all the products in the cart  
 */
+let totalPaid = 0
 
 function pay(amount) {
-  const totalCost = cartTotal();
-  const remaining = amount - totalCost;
-
+  //add the amount paid to the totalpaid
+  totalPaid += amount;
+  
+  //calculate the remaining amount after subtracting the cart total
+  let remaining = totalPaid - cartTotal()
+  
+  //check if remaining amount is greater than or = 0
+  if (remaining >= 0 ){
+    //if so, reset total paid to 0
+    totalPaid =0
+    emptyCart()
+  }
+//return remaining balance
   return remaining;
 
 }
